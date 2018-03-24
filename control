@@ -1,0 +1,10 @@
+Package: co.dynastic.ios.tweak.indt
+Name: iNDT
+Depends: mobilesubstrate, firmware (>= 11.0)
+Version: 1.0
+Architecture: iphoneos-arm
+Description: Send test notifications from a Mac
+Maintainer: AppleBetas
+Author: Dynastic Development
+Section: Tweaks
+

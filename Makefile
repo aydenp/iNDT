@@ -1,10 +1,10 @@
-TARGET = simulator:clang::13.0
-ARCHS = x86_64
-# TARGET=iphone::11.2:11.0
-# ARCHS = arm64 arm64e
+# TARGET = simulator:clang::13.0
+# ARCHS = x86_64
+TARGET=iphone::11.2:11.0
+ARCHS = arm64 arm64e
 DEBUG = 0
 
-PACKAGE_VERSION = $(THOS_PACKAGE_BASE_VERSION)
+PACKAGE_VERSION = $(THEOS_PACKAGE_BASE_VERSION)
 
 include $(THEOS)/makefiles/common.mk
 

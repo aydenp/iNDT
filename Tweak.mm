@@ -1,4 +1,5 @@
 #import "Headers.h"
+#import "NSObject+SafeKVC.h"
 #import "DDNotificationToolsManager.h"
 
 #define kStatusBarSettingsChanged @"DynasticDevelopmentiNDTStatusBarSettingsChangedNotificationName"
@@ -38,19 +39,23 @@ static NSString *carrierName = @"";
         NCNotificationRequest *request = [%c(NCNotificationRequest) notificationRequestWithSectionId:appID notificationId:[NSString stringWithFormat:@"debug-notif-req-%@", [NSUUID UUID].UUIDString] threadId:[NSString stringWithFormat:@"debug-thread-req-%@", [NSUUID UUID].UUIDString] title:title message:content timestamp:[NSDate date] destinations:[NSSet setWithObjects:@"BulletinDestinationCoverSheet", @"BulletinDestinationBanner", @"BulletinDestinationNotificationCenter", @"BulletinDestinationLockScreen", nil]];
         SBApplication *app = [[%c(SBApplicationController) sharedInstance] applicationWithBundleIdentifier:appID];
         if (app) {
-            [request.content setValue:app.displayName forKey:@"header"];
-            [request.content setValue:[[[%c(SBApplicationIcon) alloc] initWithApplication:app] generateIconImage:5] forKey:@"_icon"];
+            [request.content safelySetValue:app.displayName forKey:@"header"];
+            UIImage *iconImage = [UIImage _applicationIconImageForBundleIdentifier:app.bundleIdentifier format:5 scale:[UIScreen mainScreen].scale];
+            if (iconImage) {
+                [request.content safelySetValue:iconImage forKey:@"_icon"];
+                [request.content safelySetValue:@[iconImage] forKey:@"_icons"];
+            }
         } else {
-            [request.content setValue:appID forKey:@"header"];
+            [request.content safelySetValue:appID forKey:@"header"];
         }
-        [request.content setValue:[NSDate date] forKey:@"_date"];
-        [request.options setValue:@(1) forKey:@"_canPlaySound"];
-        [request.options setValue:@(1) forKey:@"_canTurnOnDisplay"];
-        [request.options setValue:@(1) forKey:@"_alertsWhenLocked"];
+        [request.content safelySetValue:[NSDate date] forKey:@"_date"];
+        [request.options safelySetValue:@(1) forKey:@"_canPlaySound"];
+        [request.options safelySetValue:@(1) forKey:@"_canTurnOnDisplay"];
+        [request.options safelySetValue:@(1) forKey:@"_alertsWhenLocked"];
         
-        [request setValue:[[%c(NCNotificationSound) alloc] init] forKey:@"_sound"];
-        [request.sound setValue:@(2) forKey:@"_soundType"];
-        [request.sound setValue:[(TLAlertConfiguration *)[%c(TLAlertConfiguration) alloc] initWithType:17] forKey:@"_alertConfiguration"];
+        [request safelySetValue:[[%c(NCNotificationSound) alloc] init] forKey:@"_sound"];
+        [request.sound safelySetValue:@(2) forKey:@"_soundType"];
+        [request.sound safelySetValue:[(TLAlertConfiguration *)[%c(TLAlertConfiguration) alloc] initWithType:17] forKey:@"_alertConfiguration"];
         
         [NSTimer scheduledTimerWithTimeInterval:start repeats:NO block:^(NSTimer *timer) {
             [((SpringBoard *)[UIApplication sharedApplication]).notificationDispatcher.dispatcher postNotificationWithRequest:request];
@@ -69,8 +74,26 @@ static NSString *carrierName = @"";
     }
     StatusBarOverrideData *overrides = [%c(UIStatusBarServer) getStatusBarOverrideData];
     
-    if (spoofsCarrier) strcpy(overrides->values.serviceString, [carrierName cStringUsingEncoding:NSUTF8StringEncoding]);
-    overrides->overrideServiceString = spoofsCarrier ? 1 : 0;
+    if (spoofsTime) {
+        overrides->overrideItemIsEnabled[BatteryDetail] = YES;
+        overrides->values.itemIsEnabled[BatteryDetail] = YES;
+        overrides->overrideBatteryCapacity = YES;
+        overrides->values.batteryCapacity = 100;
+        overrides->overrideBatteryState = YES;
+        overrides->values.batteryState = 0;
+        overrides->overrideBatteryDetailString = YES;
+        NSString *batteryDetailString = [NSString stringWithFormat:@"%@%%", @(overrides->values.batteryCapacity)];
+        strcpy(overrides->values.batteryDetailString, [batteryDetailString cStringUsingEncoding:NSUTF8StringEncoding]);
+    }
+
+    if (spoofsCarrier) {
+        strcpy(overrides->values.serviceString, [carrierName cStringUsingEncoding:NSUTF8StringEncoding]);
+        overrides->overrideItemIsEnabled[SignalStrengthBars] = 1;
+        overrides->values.itemIsEnabled[SignalStrengthBars] = 1;
+        overrides->overrideGsmSignalStrengthBars = 1;
+        overrides->values.gsmSignalStrengthBars = 5;
+    }
+    overrides->overrideServiceString = spoofsCarrier;
     
     [[[UIApplication sharedApplication] statusBar] setLocalDataOverrides:overrides];
     [[[UIApplication sharedApplication] statusBar] forceUpdateData:YES];

@@ -45,9 +45,13 @@
 - (void)advertiser:(MCNearbyServiceAdvertiser *)advertiser didReceiveInvitationFromPeer:(MCPeerID *)peerID withContext:(NSData *)context invitationHandler:(void (^)(BOOL, MCSession * _Nullable))invitationHandler {
     NSLog(@"Received invitation from peer. Auto-accepting...");
     
-    currentSession = [[MCSession alloc] initWithPeer:peer securityIdentity:nil encryptionPreference:MCEncryptionNone];
-    currentSession.delegate = self;
-    invitationHandler(YES, currentSession);
+    [self.delegate considerInvitationFromDeviceNamed:peerID.displayName responseHandler:^(BOOL accepted) {
+        if (!accepted) return invitationHandler(NO, nil);
+
+        currentSession = [[MCSession alloc] initWithPeer:peer securityIdentity:nil encryptionPreference:MCEncryptionNone];
+        currentSession.delegate = self;
+        invitationHandler(YES, currentSession);
+    }];
 }
 
 // MARK: - Session Delegate

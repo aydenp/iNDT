@@ -114,6 +114,25 @@ static NSString *carrierName = @"";
     }
 }
 
+- (void)considerInvitationFromDeviceNamed:(NSString *)deviceName responseHandler:(void (^)(BOOL))responseHandler {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"iNDT Connection Request"
+        message:[NSString stringWithFormat:@"'%@' would like to connect to and control some functionality of your device.", deviceName]
+        preferredStyle:UIAlertControllerStyleAlert];
+
+    [alert addAction:[UIAlertAction actionWithTitle:@"Allow" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+        responseHandler(YES);
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Decline" style:UIAlertActionStyleCancel handler:^(UIAlertAction * action) {
+        responseHandler(NO);
+    }]];
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    // keyWindow is deprecated on iOS 13, shouldn't be used for apps with multiple scenes which is okay because SpringBoard is SpringBoard.
+    [[[UIApplication sharedApplication] keyWindow].rootViewController presentViewController:alert animated:YES completion:nil];
+#pragma clang diagnostic pop
+}
+
 - (NSDictionary *)getConnectedPayload {
     return @{@"type": @"settings", @"settings": @{@"carrierName": carrierName, @"spoofsCarrier": spoofsCarrier ? @"1" : @"0", @"spoofsTime": spoofsTime ? @"1" : @"0"}};
 }

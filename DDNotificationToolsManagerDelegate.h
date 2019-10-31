@@ -13,6 +13,7 @@
 - (void)receivedNotifications:(NSArray *)notifications;
 - (void)settingNamed:(NSString *)name changedTo:(NSString *)value;
 - (void)triggeredActionNamed:(NSString *)name;
+- (void)considerInvitationFromDeviceNamed:(NSString *)deviceName responseHandler:(void (^)(BOOL))responseHandler;
 @optional
 - (NSDictionary *)getConnectedPayload;
 @end

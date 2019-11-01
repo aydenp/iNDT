@@ -1,8 +1,8 @@
 # iOS Notification Debugging Tools
 
-A quick and (somewhat) terrible solution for sending notifications to jailbroken iOS devices for testing tweaks. Based on the MultipeerConnectivity framework.
+A quick solution for sending notifications to jailbroken iOS devices for testing tweaks. Based on the MultipeerConnectivity framework.
 
-It was written during an all-nighter while trying to make marketing images for a tweak so it is not written well (esp. serialization stuff). Also the UI is rudimentary and (somewhat) annoying while typing notifications, but it's a debugging tool.
+It was written during an all-nighter while trying to make marketing images for a tweak so it is not written well (esp. serialization stuff). The UI is rudimentary, so feel free to improve if you can!
 
 ## Features
 

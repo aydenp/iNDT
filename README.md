@@ -15,10 +15,6 @@ It was written during an all-nighter while trying to make marketing images for a
 - Spoof carrier name and time
 - Relaunch SpringBoard remotely
 
-## Security Notice
-
-Installing this tweak on your device means that anyone with the Mac app on your network can send notifications. As it's a dsebugging tool, this is fine for most, but eventually it will be beneficial to add an authentication process (either a password or allow/deny connection dialog for first time pairs).
-
 ## Setup
 
 1. Install tweak on device with `make install` (Theos required)
